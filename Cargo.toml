@@ -11,4 +11,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 sha3 = "0.9"
-curve25519-dalek = "3"
+curve25519-dalek = {path = "../curve25519-dalek"}
+
+[dev-dependencies]
+rand = "0.8.0"

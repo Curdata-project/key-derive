@@ -58,18 +58,20 @@ mod tests {
     use rand::RngCore;
     #[test]
     fn test_dh() {
-        let mut rng = thread_rng();
-        let mut seed1 = [0u8; 32];
-        rng.fill_bytes(&mut seed1);
-        let mut seed2 = [0u8; 32];
-        rng.fill_bytes(&mut seed2);
+        for i in 0..10 {
+            let mut rng = thread_rng();
+            let mut seed1 = [0u8; 32];
+            rng.fill_bytes(&mut seed1);
+            let mut seed2 = [0u8; 32];
+            rng.fill_bytes(&mut seed2);
 
-        let kp1 = key_gen_from_seed(seed1);
-        let kp2 = key_gen_from_seed(seed2);
+            let kp1 = key_gen_from_seed(seed1);
+            let kp2 = key_gen_from_seed(seed2);
 
-        let sk1 = dh(kp1.public_key, kp2.screct_key);
-        let sk2 = dh(kp2.public_key, kp1.screct_key);
+            let sk1 = dh(kp1.public_key, kp2.screct_key);
+            let sk2 = dh(kp2.public_key, kp1.screct_key);
 
-        assert_eq!(sk1, sk2);
+            assert_eq!(sk1.key, sk2.key);
+        }
     }
 }

@@ -2,16 +2,31 @@ from ctypes import *
 
 _derive_key = cdll.LoadLibrary("target/debug/libderive_key.so")
 
-class Keypair(Structure):
-    _fields_ = [
-        ("screct_key", c_char * 32),
-        ("public_key", c_char * 32),
-        ("random_code", c_char * 32),
-    ]
-
 class SharedKey(Structure):
     _fields_ = [
         ("key", c_char * 32),
+    ]
+
+class PublicKey(Structure):
+    _fields_ = [
+        ("key", c_char * 32),
+    ]
+
+class SecretKey(Structure):
+    _fields_ = [
+        ("key", c_char * 32),
+    ]
+
+class Random(Structure):
+    _fields_ = [
+        ("key", c_char * 32),
+    ]
+
+class Keypair(Structure):
+    _fields_ = [
+        ("secret_key", SecretKey),
+        ("public_key", PublicKey),
+        ("random_code", Random),
     ]
 
 _derive_key.curve25519_key_gen_from_seed.argtypes = [POINTER(c_char)]
@@ -20,7 +35,7 @@ _derive_key.curve25519_key_gen_from_seed.restype = Keypair
 def curve25519_key_gen_from_seed(b):
     return _derive_key.curve25519_key_gen_from_seed(b)
 
-_derive_key.curve25519_dh.argtypes = [POINTER(c_char), POINTER(c_char)]
+_derive_key.curve25519_dh.argtypes = [PublicKey, SecretKey]
 _derive_key.curve25519_dh.restype = SharedKey
 
 def curve25519_dh(pk, sk):
@@ -48,8 +63,8 @@ def _main():
 
     seed2 = secrets.token_bytes(32)
     kp2 = curve25519_key_gen_from_seed(seed2)
-    res1 = curve25519_dh(kp1.public_key, kp2.screct_key)
-    res2 = curve25519_dh(kp2.public_key, kp1.screct_key)
+    res1 = curve25519_dh(kp1.public_key, kp2.secret_key)
+    res2 = curve25519_dh(kp2.public_key, kp1.secret_key)
     # print('shared secret:', res1.key)
     # print('shared secret:', res2.key)
     print(res1.key == res2.key)

@@ -13,14 +13,8 @@ pub extern "C" fn curve25519_key_gen_from_seed(seed: *const u8) -> curve25519::K
 }
 
 #[no_mangle]
-pub extern "C" fn curve25519_dh(pk: *const u8, sk: *const u8) -> curve25519::SharedKey {
-    let pk_slice = unsafe { from_raw_parts(pk, 32) };
-    let sk_slice = unsafe { from_raw_parts(sk, 32) };
-    let mut public_key = [0u8; 32];
-    let mut secret_key = [0u8; 32];
-    public_key.copy_from_slice(pk_slice);
-    secret_key.copy_from_slice(sk_slice);
-    curve25519::dh(public_key, secret_key)
+pub extern "C" fn curve25519_dh(pk: curve25519::PublicKey, sk: curve25519::SecretKey) -> curve25519::SharedKey {
+    curve25519::dh(pk, sk)
 }
 
 // #[no_mangle]

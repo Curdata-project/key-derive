@@ -108,7 +108,7 @@ pub extern "C" fn curve25519_derive_secret_key(sk: *const u8, id: *const u8, r: 
 }
 
 #[no_mangle]
-pub extern "C" fn curve25519_derive_public_key(pk: *const u8, id: *const u8, r: *const u8) -> *const u8 {
+pub extern "C" fn curve25519_derive_public_key(pk: *const u8, id: *const u8, r: *const u8) -> Keypair {
     let pk_slice = unsafe {
         from_raw_parts(pk, 32)
     };
@@ -144,5 +144,10 @@ pub extern "C" fn curve25519_derive_public_key(pk: *const u8, id: *const u8, r: 
     let ed_part_pk_point = part_pk_point.to_edwards(0).unwrap();
     let ed_root_pk_point = root_pk_point.to_edwards(0).unwrap();
     let pk_point = ed_part_pk_point + ed_root_pk_point;
-    pk_point.to_montgomery().to_bytes().as_ptr()
+    
+    Keypair {
+        screct_key: [0u8; 32],
+        public_key: pk_point.to_montgomery().to_bytes(),
+        random_code
+    }
 }

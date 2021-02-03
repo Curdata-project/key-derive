@@ -161,6 +161,8 @@ mod tests {
             let sk1 = dh(kp1.public_key, kp2.secret_key);
             let sk2 = dh(kp2.public_key, kp1.secret_key);
 
+            println!("{:?}", sk2);
+
             assert_eq!(sk1.key, sk2.key);
         }
     }
@@ -181,13 +183,13 @@ mod tests {
                 kp1.random_code.clone(),
                 kp1.random_code.clone(),
             );
-            println!("{:?}", new_key1);
+            // println!("{:?}", new_key1);
 
             let new_key2 =
                 derive_public_key(kp1.public_key, kp1.random_code.clone(), kp1.random_code);
-            println!("{:?}", new_key2);
+            // println!("{:?}", new_key2);
 
-            println!("{}",new_key1.public_key.key == new_key2.public_key.key);
+            // println!("{}",new_key1.public_key.key == new_key2.public_key.key);
         }
     }
 }

@@ -4,22 +4,22 @@ _derive_key = cdll.LoadLibrary("target/release/libderive_key.so")
 
 class SharedKey(Structure):
     _fields_ = [
-        ("key", c_char * 32),
+        ("key", c_byte * 32),
     ]
 
 class PublicKey(Structure):
     _fields_ = [
-        ("key", c_char * 32),
+        ("key", c_byte * 32),
     ]
 
 class SecretKey(Structure):
     _fields_ = [
-        ("key", c_char * 32),
+        ("key", c_byte * 32),
     ]
 
 class Random(Structure):
     _fields_ = [
-        ("key", c_char * 32),
+        ("key", c_byte * 32),
     ]
 
 class Keypair(Structure):
@@ -56,6 +56,7 @@ def ristretto255_derive_public_key(pk, i, r):
 
 def _main():
     import secrets
+    import numpy as np
     seed1 = secrets.token_bytes(32)
     kp1 = ristretto255_key_gen_from_seed(seed1)
 
@@ -63,11 +64,12 @@ def _main():
     kp2 = ristretto255_key_gen_from_seed(seed2)
     res1 = ristretto255_dh(kp1.public_key, kp2.secret_key)
     res2 = ristretto255_dh(kp2.public_key, kp1.secret_key)
-    print(res1.key == res2.key)
+    # print(res1.key == res2.key)
+    print(len(res1.key))
 
-    res = ristretto255_derive_secret_key(kp1.secret_key, kp1.random_code, kp1.random_code)
-    res1 = ristretto255_derive_public_key(kp1.public_key, kp1.random_code, kp1.random_code)
-    print(res.public_key.key == res1.public_key.key)
+    # res = ristretto255_derive_secret_key(kp1.secret_key, kp1.random_code, kp1.random_code)
+    # res1 = ristretto255_derive_public_key(kp1.public_key, kp1.random_code, kp1.random_code)
+    # print(res.public_key.key == res1.public_key.key)
 
 if __name__ == '__main__':
     for _ in range(30):

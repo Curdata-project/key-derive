@@ -2,6 +2,10 @@ from ctypes import *
 
 _derive_key = cdll.LoadLibrary("target/release/libderive_key.so")
 
+class Py32LengthKey:
+    def __init__(self, key):
+        self.key = bytes(key)
+
 class SharedKey(Structure):
     _fields_ = [
         ("key", c_byte * 32),
@@ -33,20 +37,22 @@ _derive_key.ristretto255_key_gen_from_seed.argtypes = [POINTER(c_char)]
 _derive_key.ristretto255_key_gen_from_seed.restype = Keypair
 
 def ristretto255_key_gen_from_seed(b):
-    return _derive_key.ristretto255_key_gen_from_seed(b)
+    keypair = _derive_key.ristretto255_key_gen_from_seed(b)
+    return keypair
 
 _derive_key.ristretto255_dh.argtypes = [PublicKey, SecretKey]
 _derive_key.ristretto255_dh.restype = SharedKey
 
 def ristretto255_dh(pk, sk):
     p = _derive_key.ristretto255_dh(pk, sk)
-    return p
+    return Py32LengthKey(p.key)
 
 _derive_key.ristretto255_derive_secret_key.argtypes = [SecretKey, Random, Random]
 _derive_key.ristretto255_derive_secret_key.restype = Keypair
 
 def ristretto255_derive_secret_key(sk, i, r):
     return _derive_key.ristretto255_derive_secret_key(sk, i, r)
+    # return Py32LengthKey(p.key)
 
 _derive_key.ristretto255_derive_public_key.argtypes = [PublicKey, Random, Random]
 _derive_key.ristretto255_derive_public_key.restype = Keypair
@@ -66,6 +72,7 @@ def _main():
     res2 = ristretto255_dh(kp2.public_key, kp1.secret_key)
     # print(res1.key == res2.key)
     print(len(res1.key))
+    print(bytes(res1.key))
 
     # res = ristretto255_derive_secret_key(kp1.secret_key, kp1.random_code, kp1.random_code)
     # res1 = ristretto255_derive_public_key(kp1.public_key, kp1.random_code, kp1.random_code)

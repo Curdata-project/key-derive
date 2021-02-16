@@ -69,8 +69,15 @@ def ristretto255_derive_public_key(pk, i, r):
 _derive_key.ristretto255_sign.argtypes = [SecretKey, PublicKey, POINTER(c_byte), c_size_t, Random]
 _derive_key.ristretto255_sign.restype = Signature
 
+def ristretto255_sign(sk, pk, mp, ml, r):
+    return _derive_key.ristretto255_sign(sk, pk, mp, ml, r)
+
 _derive_key.ristretto255_verify.argtypes = [Signature, PublicKey, POINTER(c_byte), c_size_t]
 _derive_key.ristretto255_verify.restype = c_bool
+
+def ristretto255_verify(s, pk, mp, ml):
+    return _derive_key.ristretto255_sign(s, pk, mp, ml)
+
 
 def _main():
     import secrets

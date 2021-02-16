@@ -262,4 +262,21 @@ mod tests {
             println!("{}", new_key1.public_key.key == new_key2.public_key.key);
         }
     }
+
+    #[test]
+    fn test_sign() {
+        let mut rng = thread_rng();
+        let mut seed1 = [0u8; 32];
+        rng.fill_bytes(&mut seed1);
+
+        let kp1 = key_gen_from_seed(seed1);
+
+        let buffer = b"asdasda";
+
+        let signature = sign(kp1.secret_key, kp1.public_key.clone(), buffer, kp1.random_code);
+
+        let res = verify(signature, kp1.public_key, buffer);
+
+        println!("bool: {}", res);
+    }
 }

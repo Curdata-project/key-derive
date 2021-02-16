@@ -26,6 +26,12 @@ class Random(Structure):
         ("key", c_byte * 32),
     ]
 
+    
+class Signature(Structure):
+    _fields_ = [
+        ("key", c_byte * 64),
+    ]
+
 class Keypair(Structure):
     _fields_ = [
         ("secret_key", SecretKey),
@@ -59,6 +65,12 @@ _derive_key.ristretto255_derive_public_key.restype = Keypair
 
 def ristretto255_derive_public_key(pk, i, r):
     return _derive_key.ristretto255_derive_public_key(pk, i, r)
+
+_derive_key.ristretto255_sign.argtypes = [SecretKey, PublicKey, POINTER(c_byte), c_size_t, Random]
+_derive_key.ristretto255_sign.restype = Signature
+
+_derive_key.ristretto255_verify.argtypes = [Signature, PublicKey, POINTER(c_byte), c_size_t]
+_derive_key.ristretto255_verify.restype = c_bool
 
 def _main():
     import secrets

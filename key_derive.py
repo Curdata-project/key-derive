@@ -85,17 +85,23 @@ def _main():
     seed1 = secrets.token_bytes(32)
     kp1 = ristretto255_key_gen_from_seed(seed1)
 
-    seed2 = secrets.token_bytes(32)
-    kp2 = ristretto255_key_gen_from_seed(seed2)
-    res1 = ristretto255_dh(kp1.public_key, kp2.secret_key)
-    res2 = ristretto255_dh(kp2.public_key, kp1.secret_key)
+    # seed2 = secrets.token_bytes(32)
+    # kp2 = ristretto255_key_gen_from_seed(seed2)
+    # res1 = ristretto255_dh(kp1.public_key, kp2.secret_key)
+    # res2 = ristretto255_dh(kp2.public_key, kp1.secret_key)
 
-    kp_sub1 = ristretto255_derive_secret_key(kp1.secret_key, kp1.random_code, kp1.random_code)
-    kp_sub2 = ristretto255_derive_public_key(kp1.public_key, kp1.random_code, kp1.random_code)
+    # kp_sub1 = ristretto255_derive_secret_key(kp1.secret_key, kp1.random_code, kp1.random_code)
+    # kp_sub2 = ristretto255_derive_public_key(kp1.public_key, kp1.random_code, kp1.random_code)
 
-    print(bytes(kp_sub1.public_key.key))
-    print(bytes(kp_sub2.public_key.key))
-    print(bytes(kp_sub1.public_key.key) == bytes(kp_sub2.public_key.key))
+    # print(bytes(kp_sub1.public_key.key))
+    # print(bytes(kp_sub2.public_key.key))
+    # print(bytes(kp_sub1.public_key.key) == bytes(kp_sub2.public_key.key))
+
+    message = b'asdasda'
+    m = cast(message, POINTER(c_byte))
+    r = ristretto255_sign(kp1.secret_key, kp1.public_key, m, len(message), kp1.random_code)
+    print(bytes(r.key))
+
 
 if __name__ == '__main__':
     # import secrets
@@ -105,5 +111,5 @@ if __name__ == '__main__':
     # sk = bytes(kp1.secret_key.key)
     # print(type(sk))
 
-    for _ in range(10):
-        _main()
+    # for _ in range(10):
+    _main()

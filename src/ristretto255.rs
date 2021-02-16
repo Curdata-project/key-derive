@@ -274,6 +274,8 @@ mod tests {
         let buffer = b"asdasda";
 
         let signature = sign(kp1.secret_key, kp1.public_key.clone(), buffer, kp1.random_code);
+        
+        // let buffer1 = b"asdasdaa";
 
         let res = verify(signature, kp1.public_key, buffer);
 

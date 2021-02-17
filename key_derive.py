@@ -72,7 +72,7 @@ _derive_key.ristretto255_sign.restype = Signature
 def ristretto255_sign(sk, pk, m, r):
     length = len(m)
     ptr = cast(m, POINTER(c_byte))
-    return _derive_key.ristretto255_sign(sk, pk, mp, ml, r)
+    return _derive_key.ristretto255_sign(sk, pk, ptr, length, r)
 
 _derive_key.ristretto255_verify.argtypes = [Signature, PublicKey, POINTER(c_byte), c_size_t]
 _derive_key.ristretto255_verify.restype = c_bool
@@ -80,7 +80,7 @@ _derive_key.ristretto255_verify.restype = c_bool
 def ristretto255_verify(s, pk, m):
     length = len(m)
     ptr = cast(m, POINTER(c_byte))
-    return _derive_key.ristretto255_sign(s, pk, mp, ml)
+    return _derive_key.ristretto255_sign(s, pk, ptr, length)
 
 
 def _main():
@@ -101,10 +101,10 @@ def _main():
     # print(bytes(kp_sub2.public_key.key))
     # print(bytes(kp_sub1.public_key.key) == bytes(kp_sub2.public_key.key))
 
-    message = b'asdasda'
-    m = cast(message, POINTER(c_byte))
-    r = ristretto255_sign(kp1.secret_key, kp1.public_key, m, len(message), kp1.random_code)
-    print(bytes(r.key))
+    # message = b'asdasda'
+    # m = cast(message, POINTER(c_byte))
+    # r = ristretto255_sign(kp1.secret_key, kp1.public_key, m, len(message), kp1.random_code)
+    # print(bytes(r.key))
 
 
 if __name__ == '__main__':

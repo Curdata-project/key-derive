@@ -59,7 +59,7 @@ _derive_key.ristretto255_derive_secret_key.restype = Keypair
 def ristretto255_derive_secret_key(sk, i, r):
     return _derive_key.ristretto255_derive_secret_key(sk, i, r)
     # return Py32LengthKey(p.key)
-
+     
 _derive_key.ristretto255_derive_public_key.argtypes = [PublicKey, Random, Random]
 _derive_key.ristretto255_derive_public_key.restype = Keypair
 
@@ -80,8 +80,7 @@ _derive_key.ristretto255_verify.restype = c_bool
 def ristretto255_verify(s, pk, m):
     length = len(m)
     ptr = cast(m, POINTER(c_byte))
-    return _derive_key.ristretto255_sign(s, pk, ptr, length)
-
+    return _derive_key.ristretto255_verify(s, pk, ptr, length)
 
 def _main():
     import secrets

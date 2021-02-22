@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 sha3 = "0.9"
-curve25519-dalek = "3"
+curve25519-dalek = {version = "3", default-features = false, features = ["u32_backend"]}
 
 [dev-dependencies]
 rand = "0.8.0"

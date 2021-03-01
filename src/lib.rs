@@ -1,6 +1,7 @@
 use std::slice::from_raw_parts;
 
 mod ristretto255;
+mod wasm_ristretto255;
 
 #[no_mangle]
 pub extern "C" fn ristretto255_key_gen_from_seed(seed: *const u8) -> ristretto255::Keypair {

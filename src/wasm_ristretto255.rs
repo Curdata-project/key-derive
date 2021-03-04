@@ -8,39 +8,39 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct Keypair {
-    secret_key: SecretKey,
-    public_key: PublicKey,
-    random_code: Random,
+    pub secret_key: SecretKey,
+    pub public_key: PublicKey,
+    pub random_code: Random,
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct SharedKey {
-    key: Box<[u8]>,
+    pub key: Box<[u8]>,
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct PublicKey {
-    key: Box<[u8]>,
+    pub key: Box<[u8]>,
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct SecretKey {
-    key: Box<[u8]>,
+    pub key: Box<[u8]>,
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct Random {
-    key: Box<[u8]>,
+    pub key: Box<[u8]>,
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct Signature {
-    key: Box<[u8]>, //64
+    pub key: Box<[u8]>, //64
 }
 
 #[wasm_bindgen]

@@ -3,48 +3,43 @@ use curve25519_dalek::ristretto::{CompressedRistretto, RistrettoPoint};
 use curve25519_dalek::scalar::Scalar;
 use sha3::{Digest, Sha3_512};
 use wasm_bindgen::prelude::*;
+use serde::{Serialize, Deserialize};
 
-#[wasm_bindgen]
-#[derive(Debug, Clone)]
-#[repr(C)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Keypair {
-    pub secret_key: SecretKey,
-    pub public_key: PublicKey,
-    pub random_code: Random,
+    pub secret_key: Vec<u8>,
+    pub public_key: Vec<u8>,
+    pub random_code: Vec<u8>,
 }
-#[wasm_bindgen]
-#[derive(Debug, Clone)]
-#[repr(C)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SharedKey {
-    pub key: Box<[u8]>,
+    pub key: Vec<u8>,
 }
-#[wasm_bindgen]
-#[derive(Debug, Clone)]
-#[repr(C)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PublicKey {
-    pub key: Box<[u8]>,
+    pub key: Vec<u8>,
 }
-#[wasm_bindgen]
-#[derive(Debug, Clone)]
-#[repr(C)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SecretKey {
-    pub key: Box<[u8]>,
+    pub key: Vec<u8>,
 }
-#[wasm_bindgen]
-#[derive(Debug, Clone)]
-#[repr(C)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Random {
-    pub key: Box<[u8]>,
+    pub key: Vec<u8>,
 }
-#[wasm_bindgen]
-#[derive(Debug, Clone)]
-#[repr(C)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Signature {
-    pub key: Box<[u8]>, //64
+    pub key: Vec<u8>, //64
 }
 
 #[wasm_bindgen]
-pub fn wasm_key_gen_from_seed(seed: Option<Box<[u8]>>) -> Keypair {
+pub fn wasm_key_gen_from_seed(seed: Option<Box<[u8]>>) -> String {
     let mut hasher = Sha3_512::new();
     let seed = seed.unwrap();
     hasher.update(seed.as_ref());
@@ -62,17 +57,15 @@ pub fn wasm_key_gen_from_seed(seed: Option<Box<[u8]>>) -> Keypair {
 
     let pk_compress = pk_point.compress();
 
-    Keypair {
-        secret_key: SecretKey {
-            key: sk.to_bytes().to_vec().into_boxed_slice(),
-        },
-        public_key: PublicKey {
-            key: pk_compress.to_bytes().to_vec().into_boxed_slice(),
-        },
-        random_code: Random {
-            key: random_code.to_vec().into_boxed_slice(),
-        },
-    }
+    let keypair = Keypair{
+        secret_key: sk.as_bytes().to_vec(),
+        public_key: pk_compress.as_bytes().to_vec(),
+        random_code: random_code.to_vec()
+    };
+
+    let jsons = serde_json::to_string(&keypair).unwrap();
+
+    jsons
 }
 
 #[wasm_bindgen]
@@ -80,7 +73,7 @@ pub fn wasm_derive_public_key(
     pk: Option<Box<[u8]>>,
     id: Option<Box<[u8]>>,
     r: Option<Box<[u8]>>,
-) -> Keypair {
+) -> String {
     let pk = pk.unwrap();
     let id = id.unwrap();
     let r = r.unwrap();
@@ -107,21 +100,19 @@ pub fn wasm_derive_public_key(
     let pk_point = &part_pk_point + &root_pk_point;
     let pk_point_compossed = pk_point.compress();
 
-    Keypair {
-        secret_key: SecretKey {
-            key: vec![0u8, 32].into_boxed_slice(),
-        },
-        public_key: PublicKey {
-            key: pk_point_compossed.to_bytes().to_vec().into_boxed_slice(),
-        },
-        random_code: Random {
-            key: random_code.to_vec().into_boxed_slice(),
-        },
-    }
+    let keypair = Keypair{
+        secret_key: vec![0u8,32],
+        public_key: pk_point_compossed.as_bytes().to_vec(),
+        random_code: random_code.to_vec()
+    };
+
+    let jsons = serde_json::to_string(&keypair).unwrap();
+
+    jsons
 }
 
 #[wasm_bindgen]
-pub fn wasm_dh(pk: Option<Box<[u8]>>, sk: Option<Box<[u8]>>) -> SharedKey {
+pub fn wasm_dh(pk: Option<Box<[u8]>>, sk: Option<Box<[u8]>>) -> String {
     let pk = pk.unwrap();
     let sk = sk.unwrap();
 
@@ -135,10 +126,12 @@ pub fn wasm_dh(pk: Option<Box<[u8]>>, sk: Option<Box<[u8]>>) -> SharedKey {
     let pk_point_compressed = CompressedRistretto::from_slice(pk.as_ref());
     let pk_point = pk_point_compressed.decompress().unwrap();
     let secret = &sk_scalar * &pk_point;
-    SharedKey {
-        key: secret.compress().to_bytes().to_vec().into_boxed_slice(),
-    }
+
+    let s = SharedKey{ key: secret.compress().to_bytes().to_vec() };
+    let jsons = serde_json::to_string(&s).unwrap();
+    jsons
 }
+
 
 #[wasm_bindgen]
 #[allow(non_snake_case)]
@@ -147,7 +140,7 @@ pub fn wasm_sign(
     pk: Option<Box<[u8]>>,
     message: Option<Box<[u8]>>,
     nonce: Option<Box<[u8]>>,
-) -> Signature {
+) -> String {
     let sk = sk.unwrap();
     let pk = pk.unwrap();
     let message = message.unwrap();
@@ -189,9 +182,12 @@ pub fn wasm_sign(
     sign_bytes[..32].copy_from_slice(&R.as_bytes()[..]);
     sign_bytes[32..].copy_from_slice(&s.as_bytes()[..]);
 
-    Signature {
-        key: sign_bytes.to_vec().into_boxed_slice(),
-    }
+    let s = Signature {
+        key: sign_bytes.to_vec()
+    };
+
+    let jsons = serde_json::to_string(&s).unwrap();
+    jsons
 }
 
 #[wasm_bindgen]
@@ -234,8 +230,6 @@ pub fn wasm_verify(
     let R = RistrettoPoint::vartime_double_scalar_mul_basepoint(&k, &(minus_A), &ss);
 
     R.compress() == sR
-
-    // true
 }
 
 #[wasm_bindgen]
@@ -243,7 +237,7 @@ pub fn derive_secret_key(
     sk: Option<Box<[u8]>>,
     id: Option<Box<[u8]>>,
     r: Option<Box<[u8]>>,
-) -> Keypair {
+) -> String {
     let sk = sk.unwrap();
     let id = id.unwrap();
     let r = r.unwrap();
@@ -280,15 +274,12 @@ pub fn derive_secret_key(
     let pk_point = &RISTRETTO_BASEPOINT_TABLE * &sk_point;
     let pk_point_compossed = pk_point.compress();
 
-    Keypair {
-        secret_key: SecretKey {
-            key: sk_point.to_bytes().to_vec().into_boxed_slice(),
-        },
-        public_key: PublicKey {
-            key: pk_point_compossed.to_bytes().to_vec().into_boxed_slice(),
-        },
-        random_code: Random {
-            key: random_code.to_vec().into_boxed_slice(),
-        },
-    }
+    let k = Keypair {
+        secret_key: sk_point.to_bytes().to_vec(),
+        public_key: pk_point_compossed.to_bytes().to_vec(),
+        random_code: random_code.to_vec()
+    };
+
+    let jsons = serde_json::to_string(&k).unwrap();
+    jsons
 }
